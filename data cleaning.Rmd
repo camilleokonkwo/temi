@@ -1,0 +1,47 @@
+---
+title: "temi"
+author: "Camille Okonkwo"
+date: "2024-04-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(readxl)
+library(writexl)
+```
+
+
+```{r cars}
+maternal_data = read_excel("data/Maternal Data.xlsx") |> 
+  janitor::clean_names()
+
+racism_data = read_excel("data/For Temi_city racism data (1).xlsx") |> 
+  janitor::clean_names()
+
+Q3 = 
+  left_join(maternal_data, racism_data, by = "place")
+  
+Q3_clean =
+  Q3 |> 
+  select(place, 
+         x2017_black_maternal,
+         x2018_black_maternal,
+         x2019_black_maternal,
+         x2020_black_maternal,
+         historical_period1,
+         historical_period2,
+         historical_period3) |>
+  rename(
+    "2017_rate" = x2017_black_maternal,
+    "2018_rate" = x2018_black_maternal,
+    "2019_rate" = x2019_black_maternal,
+    "2020_rate" = x2020_black_maternal
+  ) |> 
+  gather(year, rate, starts_with("20"), -place, -historical_period1, -historical_period2, -historical_period3) |> 
+  mutate(year = str_replace(year, "_rate", ""))
+  
+write_xlsx(Q3_clean, "Q3_clean.xlsx")
+```
+
